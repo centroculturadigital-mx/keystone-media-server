@@ -1,63 +1,49 @@
 const createImageSizes = async (keystone) => {
-  const ImageSizesMetaQuery = await keystone.executeQuery(
+  const res = await keystone.executeQuery(
     `query {
-      _allImageSizesMeta {
-        count
+      allImageSizes {
+        id
+        name
+        size
       }
     }`
   );
 
-  let ImageSizesCount = ImageSizesMetaQuery.data ?
-    ImageSizesMetaQuery.data._allImageSizesMeta?
-      ImageSizesMetaQuery.data._allImageSizesMeta.count
-      : null
-  : null
+  const imageSizes = res.data.allImageSizes
+
   
 
-  if (ImageSizesCount === 0) {
-
+  if (imageSizes.length === 0) {
 
     const sizes = [
-        {
-            name:"xs",
-            size:320
-        },
-        {
-            name:"md",
-            size:768
-        },
-        {
-            name:"lg",
-            size: 1024
-        },
-        {
-            name:"xl",
-            size: 1600
-        },
+      {data: { name:"xs", size:320 } },
+      {data: { name:"md", size:768 } },
+      {data: { name:"lg", size: 1024 } },
+      {data: { name:"xl", size: 1600 } },
     ]
 
-    for( {name, size} of sizes ) {
-
-
-        const res = await keystone.executeQuery(
-        `mutation initialImageSize($name: String, $size: Int) {
-                createImageSize(data: {  size: $size, name: $name}) {
-                id
-                }
-            }`,
-        {
-            variables: {
-                name,
-                size,
-            },
-        }
-        );
-
-
+    const res = await keystone.executeQuery(
+    `mutation initialImageSizes($data: [ImageSizesCreateInput] ) {
+      createImageSizes(data: $data) {
+        id
+        name
+        size
+      }
+    }`,
+    {
+        variables: {
+          data: sizes
+        },
     }
+    );
 
+    console.log('createImageSizes', res)
+
+    return res.data.createImageSizes
     
   }
+
+  return imageSizes
 }
 
 module.exports = createImageSizes

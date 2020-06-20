@@ -13,13 +13,14 @@ const onImageInput = async ({
   keystone,
   operation,
   existingItem,
+  updatedItem,
   originalInput,
   resolvedData,
   context,
   actions,
 }) => {
 
-  if ( !! resolvedData.original ) {
+  if ( !! updatedItem.original ) {
 
     const sizeQuery = await keystone.executeQuery(
       `query {
@@ -31,23 +32,26 @@ const onImageInput = async ({
     );
 
     const imageSizes = sizeQuery.data.allImageSizes
-
-    if ( ! Array.isArray(resolvedData.sizes) || ! resolvedData.sizes.length ) {
-      resolvedData.sizes = imageSizes.map(s => s.id)
+    
+    if ( ! Array.isArray(updatedItem.sizes) || ! updatedItem.sizes.length ) {
+      updatedItem.sizes = imageSizes.map(s => s.id)
     }
+    
+    for(s of updatedItem.sizes) {
 
-    for(s of resolvedData.sizes) {
+      let imageSize = imageSizes.find(is => {
+        return is.id === s.toString()
+      } )
 
-      
-
-      let imageSize = imageSizes.find(is => is.id === s )
       let size = imageSize ?  imageSize.size : 320
       let imageSizeId = imageSize ? imageSize.id : null 
 
       const { HOST, PORT, IMGPROXY_HOST, IMGPROXY_PORT, MEDIA_FOLDER } = process.env
       
 
-      let url = `http://${HOST}:${PORT}/${MEDIA_FOLDER}/${resolvedData.original.filename}`
+      let url = `http://${HOST}:${PORT}/${MEDIA_FOLDER}/${updatedItem.original.filename}`
+
+      console.log('url', url)
 
       const signature = generateSignature({
         url,
@@ -59,16 +63,14 @@ const onImageInput = async ({
         extension: 'png',
       });
 
-      
-
       let image = await fetch(`http://${IMGPROXY_HOST}:${IMGPROXY_PORT}/${signature}`)
-    
         
-      let filename = resolvedData.original.filename
-      let name = resolvedData.name || resolvedData.original.filename
+      let filename = updatedItem.original.filename
+      let name = updatedItem.name || updatedItem.original.filename
       let fileExt = filename.split('.').reverse()[0]
       
-      filename = filename.split('-')[1].split('.'+fileExt)[0] + size + '.' +  fileExt
+      filename = filename.split('-')[1].split('.'+fileExt)[0] + '-' + size + '.' +  fileExt
+
 
       const encoding = "7bit"
       const buffer = await image.buffer()
@@ -104,18 +106,18 @@ const onImageInput = async ({
           },
         }
       );
-
       
-      if ( ! Array.isArray(resolvedData.resizedImages) ) {
-        resolvedData.resizedImages = []
+      console.log('createMediaFile', response)
+      
+      if ( ! Array.isArray(updatedItem.resizedImages) ) {
+        updatedItem.resizedImages = []
       }
-      resolvedData.resizedImages.push(response.data.createMediaFile.id)
+      updatedItem.resizedImages.push(response.data.createMediaFile.id)
     }
     
     
   }
 
-  return resolvedData
 }
 
 module.exports = onImageInput

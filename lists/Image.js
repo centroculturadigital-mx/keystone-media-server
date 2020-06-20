@@ -31,7 +31,7 @@ module.exports = {
     owner: { type: Text },
   },
   labelResolver: item => {
-    console.log*("got,",item)
+    console.log("got,",item)
     if( !! item && !! item.original ) {
 
       const { DOMAIN, PORT, IMGPROXY_HOST, IMGPROXY_PORT, MEDIA_FOLDER } = process.env
