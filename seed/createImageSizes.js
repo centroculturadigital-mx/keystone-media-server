@@ -1,13 +1,16 @@
 const createImageSizes = async (keystone) => {
-  const res = await keystone.executeQuery(
-    `query {
-      allImageSizes {
-        id
-        name
-        size
+  const res = await keystone.executeGraphQL({
+    context: keystone.createContext({ skipAccessControl: true }),
+    query:`
+      query {
+        allImageSizes {
+          id
+          name
+          size
+        }
       }
-    }`
-  );
+    `
+  });
 
   const imageSizes = res.data.allImageSizes
 
@@ -22,22 +25,21 @@ const createImageSizes = async (keystone) => {
       {data: { name:"xl", size: 1600 } },
     ]
 
-    const res = await keystone.executeQuery(
-    `mutation initialImageSizes($data: [ImageSizesCreateInput] ) {
-      createImageSizes(data: $data) {
-        id
-        name
-        size
-      }
-    }`,
-    {
-        variables: {
-          data: sizes
-        },
-    }
-    );
-
-    console.log('createImageSizes', res)
+    const res = await keystone.executeGraphQL({
+      context: keystone.createContext({ skipAccessControl: true }),
+      query:`
+        mutation initialImageSizes($data: [ImageSizesCreateInput] ) {
+          createImageSizes(data: $data) {
+            id
+            name
+            size
+          }
+        }
+      `,
+      variables: {
+        data: sizes
+      },
+    });
 
     return res.data.createImageSizes
     

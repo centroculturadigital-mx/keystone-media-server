@@ -10,7 +10,6 @@ function bufferToStream(buffer) {
 }
 
 const onImageInput = async ({
-  keystone,
   operation,
   existingItem,
   updatedItem,
@@ -22,14 +21,17 @@ const onImageInput = async ({
 
   if ( !! updatedItem.original ) {
 
-    const sizeQuery = await keystone.executeQuery(
-      `query {
-        allImageSizes {
-          id
-          size
+    const sizeQuery = await context.executeGraphQL({
+      context: context.createContext({ skipAccessControl: true }),
+      query:`
+        query {
+          allImageSizes {
+            id
+            size
+          }
         }
-      }`
-    );
+      `
+    });
 
     const imageSizes = sizeQuery.data.allImageSizes
     
@@ -50,8 +52,6 @@ const onImageInput = async ({
       
 
       let url = `http://${HOST}:${PORT}/${MEDIA_FOLDER}/${updatedItem.original.filename}`
-
-      console.log('url', url)
 
       const signature = generateSignature({
         url,
@@ -78,36 +78,35 @@ const onImageInput = async ({
 
       const file = { createReadStream: () => bufferToStream(buffer), filename, mimetype, encoding }
 
-      const response = await keystone.executeQuery(
-        `mutation generateMediaFile(
-          $name: String, 
-          $file: Upload,
-          $size: ID!
-        ) {
-          createMediaFile (
-            data: {
-              name: $name,
-              file: $file,
-              size: {
-                connect: {
-                  id: $size
+      const response = await context.executeGraphQL({
+        context: context.createContext({ skipAccessControl: true }),
+        query:`
+          mutation generateMediaFile(
+            $name: String, 
+            $file: Upload,
+            $size: ID!
+          ) {
+            createMediaFile (
+              data: {
+                name: $name,
+                file: $file,
+                size: {
+                  connect: {
+                    id: $size
+                  }
                 }
               }
+            ) {
+              id
             }
-          ) {
-            id
           }
-        }`,
-        {
-          variables: {
-            name,
-            file,
-            size: imageSizeId
-          },
-        }
-      );
-      
-      console.log('createMediaFile', response)
+        `,
+        variables: {
+          name,
+          file,
+          size: imageSizeId
+        },
+      });
       
       if ( ! Array.isArray(updatedItem.resizedImages) ) {
         updatedItem.resizedImages = []
