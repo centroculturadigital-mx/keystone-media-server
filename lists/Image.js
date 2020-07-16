@@ -34,7 +34,7 @@ module.exports = {
     if( !! item && !! item.original ) {
 
       const { DOMAIN, PORT, IMGPROXY_HOST, IMGPROXY_PORT, MEDIA_FOLDER } = process.env
-      let url = `${DOMAIN}:${PORT}/${MEDIA_FOLDER}/${item.original.filename}`
+      let url = `${DOMAIN}/${MEDIA_FOLDER}/${item.original.filename}`
       
       return url
    
