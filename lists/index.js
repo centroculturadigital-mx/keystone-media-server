@@ -1,9 +1,11 @@
 const Image = require('./Image')
-const MediaFile = require('./MediaFile')
+const ResizedImage = require('./ResizedImage')
 const ImageSize = require('./ImageSize')
+const Media = require('./Media')
 
 module.exports = {
   Image,
-  MediaFile,
-  ImageSize,  
+  ResizedImage,
+  ImageSize,
+  Media
 }

@@ -44,10 +44,13 @@ const onImageInput = async ({
       let imageSize = imageSizes.find(is => is.id === s )
       let size = imageSize ?  imageSize.size : 320
       let imageSizeId = imageSize ? imageSize.id : null 
+      let imageId = resolvedData.id 
 
       const { HOST, PORT, IMGPROXY_HOST, IMGPROXY_PORT, MEDIA_FOLDER } = process.env
       
       let url = `http://${HOST}:${PORT}/${MEDIA_FOLDER}/${resolvedData.original.filename}`
+
+      console.log('imageUrl', url)
 
       const signature = generateSignature({
         url,
@@ -60,6 +63,8 @@ const onImageInput = async ({
       })
 
       let image = await fetch(`http://${IMGPROXY_HOST}:${IMGPROXY_PORT}/${signature}`)
+
+      console.log('afterImgProxy', image)
         
       let filename = resolvedData.original.filename
       let name = resolvedData.name || resolvedData.original.filename
@@ -76,18 +81,24 @@ const onImageInput = async ({
       const response = await keystone.executeGraphQL({
         context: keystone.createContext({ skipAccessControl: true }),
         query:`
-          mutation generateMediaFile(
+          mutation generateResizedImage(
             $name: String, 
             $file: Upload,
-            $size: ID!
+            $size: ID!,
+            $image: ID!
           ) {
-            createMediaFile (
+            createResizedImage (
               data: {
                 name: $name,
                 file: $file,
                 size: {
                   connect: {
                     id: $size
+                  }
+                },
+                image: {
+                  connect: {
+                    id: $image
                   }
                 }
               }
@@ -99,7 +110,8 @@ const onImageInput = async ({
         variables: {
           name,
           file,
-          size: imageSizeId
+          size: imageSizeId,
+          image: imageId
         },
       })
       

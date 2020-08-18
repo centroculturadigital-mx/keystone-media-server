@@ -1,5 +1,7 @@
 const { Text, File, Relationship } = require('@keystonejs/fields');
 const { LocalFileAdapter } = require('@keystonejs/file-adapters');
+const PathFile = require('../fields/PathFile')
+const ImageRelationship = require('../fields/ImageRelationship')
 
 const fileAdapter = new LocalFileAdapter({
   src: process.env.NODE_ENV === 'production' ? './dist/archivos' : './archivos',
@@ -13,12 +15,18 @@ module.exports = {
       type: Text,
     },
     file: {
-      type: File,
-      adapter: fileAdapter
+      type: PathFile,
+      adapter: fileAdapter,
+      label: "Archivo descargable",
+      isRequired: true,
     },
     size: {
       type: Relationship,
       ref: "ImageSize"
+    },
+    image: {
+      type: ImageRelationship,
+      ref: "Image.resizedImages"  
     }
   },
   adminConfig: {

@@ -1,4 +1,5 @@
-const { File, Relationship, Text } = require('@keystonejs/fields');
+const { Relationship, Text } = require('@keystonejs/fields');
+const PathFile = require('../../campos/PathFile');
 const { LocalFileAdapter } = require('@keystonejs/file-adapters');
 
 const IMGPROXY_KEY = process.env.IMGPROXY_KEY
@@ -13,7 +14,7 @@ module.exports = {
   fields: {
     name: { type: Text },
     original: {
-      type: File,
+      type: PathFile,
       adapter: fileAdapter
     },
     sizes: {
@@ -23,7 +24,7 @@ module.exports = {
     },
     resizedImages: {
       type: Relationship,
-      ref: 'MediaFile',
+      ref: 'ResizedImages.image',
       many: true
     },
     credits: { type: Text },
