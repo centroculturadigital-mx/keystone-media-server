@@ -11,6 +11,7 @@ import { Lozenge } from '@arch-ui/lozenge';
 import { Button, LoadingButton } from '@arch-ui/button';
 import { FlexGroup } from '@arch-ui/layout';
 import { borderRadius, colors, gridSize } from '@arch-ui/theme';
+import {CopyToClipboard} from 'react-copy-to-clipboard';
 
 function uploadButtonLabelFn({ status }) {
   return status === 'empty' ? 'Upload File' : 'Change File';
@@ -72,6 +73,7 @@ export default class PathFileField extends Component {
       errorMessage: null,
       isLoading: false,
       oldImagePath: null,
+      copied: false
     };
   }
 
@@ -244,6 +246,22 @@ export default class PathFileField extends Component {
                         {statusMessage({ status: changeStatus })}
                       </ChangeInfo>
                     ) : null}
+                    <CopyToClipboard
+                      text={window.location.origin + file.publicUrl}
+                      onCopy={() => {
+                        this.setState({copied: true})
+                        setTimeout(() => {
+                          this.setState({copied: false})
+                        }, 3000)
+                      }}
+                    >
+                      <span style={{backgroundColor: '#ddd', borderRadius: '3px', padding: '3px', cursor: 'context-menu'}}>Copy</span>
+                    </CopyToClipboard>
+                    <span>
+                      {
+                        this.state.copied ? 'Copied!' : ''
+                      }
+                    </span>
                   </FlexGroup>
                 )}
               </Content>
