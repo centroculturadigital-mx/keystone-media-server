@@ -183,8 +183,6 @@ const RelationshipField = ({
 
   const relatedList = field.getRefList();
 
-  console.log({value});
-
   return (
     <FieldContainer>
       <FieldLabel htmlFor={htmlID} field={field} errors={errors} />

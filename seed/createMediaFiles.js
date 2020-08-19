@@ -8,13 +8,13 @@ function bufferToStream(buffer) {
   return newStream
 }
 
-const readFile = async () => {
+const readMediaFile = async () => {
 
   const filename = "test-file.pdf"
   const encoding = "binary"
   const mimetype = 'application/pdf'
 
-  const fileRead = await fs.readFileSync(__dirname+filename)
+  const fileRead = await fs.readFileSync(__dirname+'/'+filename)
   
   const buffer = Buffer(fileRead)
 
@@ -24,13 +24,13 @@ const readFile = async () => {
 
 }
 
-const createMedias = async (keystone, number = 1) => {
+const createMediaFiles = async (keystone, number = 1) => {
 
   const medias = await Promise.all(new Array(number).fill({}).map(async (e,i) => {
     return {
       data: {
         name: 'test-file',
-        file: await readFile(),
+        file: await readMediaFile(),
       }
     }
   }))
@@ -38,11 +38,10 @@ const createMedias = async (keystone, number = 1) => {
   const res = await keystone.executeGraphQL({
     context: keystone.createContext({ skipAccessControl: true }),
     query: `
-      mutation initialMedias($data: [MediasCreateInput] ) {
-        createMedias(data: $data) {
+      mutation initialMedias($data: [MediaFilesCreateInput] ) {
+        createMediaFiles(data: $data) {
           id
           name
-          size
         }
       }
     `,
@@ -51,8 +50,10 @@ const createMedias = async (keystone, number = 1) => {
     },
   })
 
-  return res.data.createMedias
+  console.log('createMediaFiles', res)
+
+  return res.data.createMediaFiles
 
 }
 
-module.exports = createMedias
+module.exports = createMediaFiles

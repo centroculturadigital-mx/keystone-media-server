@@ -10,7 +10,7 @@ const fileAdapter = new LocalFileAdapter({
 
 const { atTracking } = require('@keystonejs/list-plugins');
 
-const Media = {
+const MediaFile = {
   fields: {
     name: {
       type: Text,
@@ -42,4 +42,4 @@ const Media = {
   ]
 }
 
-module.exports = Media
+module.exports = MediaFile

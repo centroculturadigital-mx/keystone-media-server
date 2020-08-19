@@ -41,16 +41,15 @@ const onImageInput = async ({
 
     for(s of resolvedData.sizes) {
 
+      console.log(resolvedData)
+
       let imageSize = imageSizes.find(is => is.id === s )
       let size = imageSize ?  imageSize.size : 320
       let imageSizeId = imageSize ? imageSize.id : null 
-      let imageId = resolvedData.id 
 
       const { HOST, PORT, IMGPROXY_HOST, IMGPROXY_PORT, MEDIA_FOLDER } = process.env
       
       let url = `http://${HOST}:${PORT}/${MEDIA_FOLDER}/${resolvedData.original.filename}`
-
-      console.log('imageUrl', url)
 
       const signature = generateSignature({
         url,
@@ -64,8 +63,6 @@ const onImageInput = async ({
 
       let image = await fetch(`http://${IMGPROXY_HOST}:${IMGPROXY_PORT}/${signature}`)
 
-      console.log('afterImgProxy', image)
-        
       let filename = resolvedData.original.filename
       let name = resolvedData.name || resolvedData.original.filename
       let fileExt = filename.split('.').reverse()[0]
@@ -84,8 +81,7 @@ const onImageInput = async ({
           mutation generateResizedImage(
             $name: String, 
             $file: Upload,
-            $size: ID!,
-            $image: ID!
+            $size: ID!
           ) {
             createResizedImage (
               data: {
@@ -94,11 +90,6 @@ const onImageInput = async ({
                 size: {
                   connect: {
                     id: $size
-                  }
-                },
-                image: {
-                  connect: {
-                    id: $image
                   }
                 }
               }
@@ -110,16 +101,17 @@ const onImageInput = async ({
         variables: {
           name,
           file,
-          size: imageSizeId,
-          image: imageId
+          size: imageSizeId
         },
       })
+
+      console.log('createResizedImage', response)
       
       if ( ! Array.isArray(resolvedData.resizedImages) ) {
         resolvedData.resizedImages = []
       }
 
-      resolvedData.resizedImages.push(response.data.createMediaFile.id)
+      resolvedData.resizedImages.push(response.data.createResizedImage.id)
 
     }
     
