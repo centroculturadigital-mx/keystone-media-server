@@ -55,8 +55,6 @@ const createImages = async (keystone, number = 4, {imageSizes, prefix, extension
     },
   })
 
-  console.log('createImages', res)
-
   return res.data.createImages
 
 }

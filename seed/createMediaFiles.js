@@ -50,8 +50,6 @@ const createMediaFiles = async (keystone, number = 1) => {
     },
   })
 
-  console.log('createMediaFiles', res)
-
   return res.data.createMediaFiles
 
 }

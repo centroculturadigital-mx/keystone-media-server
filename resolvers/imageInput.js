@@ -41,8 +41,6 @@ const onImageInput = async ({
 
     for(s of resolvedData.sizes) {
 
-      console.log(resolvedData)
-
       let imageSize = imageSizes.find(is => is.id === s )
       let size = imageSize ?  imageSize.size : 320
       let imageSizeId = imageSize ? imageSize.id : null 
@@ -105,8 +103,6 @@ const onImageInput = async ({
         },
       })
 
-      console.log('createResizedImage', response)
-      
       if ( ! Array.isArray(resolvedData.resizedImages) ) {
         resolvedData.resizedImages = []
       }
