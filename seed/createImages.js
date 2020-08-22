@@ -14,8 +14,16 @@ const readImage = async (index = Math.random()*4, prefix="test", extension="jpg"
   const fileType = filename.split('.')[1]
   const encoding = "7bit"
   const mimetype = fileType == 'png' ? 'image/png' : 'image/jpeg'
+  
+  let fileRead
 
-  const fileRead = await fs.readFileSync(__dirname+'/test-images/'+filename)
+  try {
+  
+    fileRead = await fs.readFileSync(__dirname+'/test-images/'+filename)
+    
+  } catch(err) {
+    console.log("Image Error:", err);
+  }
 
   const buffer = Buffer(fileRead)
 
