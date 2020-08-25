@@ -161,8 +161,8 @@ function CreateAndAddItem({ field, item, onCreate }) {
 
 const Image = ({ src, remove }) => (
   <article css={{ position: "relative", width: 160 }}>
-    <span onClick={()=>remove()} css={{ position: "absolute", top: "0", right: "0" }}>
-      X
+    <span onClick={()=>remove()} css={{ position: "absolute", display: "grid", placeItems: "center", top: "0", right: "0", cursor: "pointer", margin: "0.5rem", background: "#fff", borderRadius: "50%", boxShadow: "3px 3px 3px rgba(0,0,0,0.4)", width: "1rem", height: "1rem", fontSize:"12px" }}>
+      <span>x</span>
     </span>
     <img src={ src } width="160px" css={{ objectPosition: "contain" }}/>
   </article>
@@ -203,12 +203,18 @@ const RelationshipField = ({
     }
     onChange( newValue )
   }
-
+  
+  const emptyStateStrings = {
+    single: "Please add an image >>",
+    many: "Please add one or more images >>",
+  }
 
   let imagenes
 
   if( many ) {
-    imagenes = value.map(v=>(<Image key={v._label_} src={v._label_} remove={()=>removeFunc(v)}/>))
+    imagenes = value.length > 0
+      ? value.map(v=>(<Image key={v._label_} src={v._label_} remove={()=>removeFunc(v)}/>))
+      : emptyStateStrings.many
   }
 
 
@@ -222,11 +228,15 @@ const RelationshipField = ({
       <FieldInput>
         <div css={{ flex: 1 }}>
           {
-            value &&
-            value._label_ &&
-            ! many
-              ? (<Image src={value._label_} remove={()=>removeFunc(value)}/>)
-              : imagenes
+            (
+              value &&
+              value._label_ &&
+              ! many
+                ? <Image src={value._label_} remove={()=>removeFunc(value)}/>
+                : imagenes
+              )
+            ||
+            emptyStateStrings.single
           }
         </div>
         <ListProvider list={relatedList}>
