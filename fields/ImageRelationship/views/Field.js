@@ -158,6 +158,16 @@ function CreateAndAddItem({ field, item, onCreate }) {
   );
 }
 
+
+const Image = ({ src, remove }) => (
+  <article css={{ position: "relative", width: 160 }}>
+    <span onClick={()=>remove()} css={{ position: "absolute", top: "0", right: "0" }}>
+      X
+    </span>
+    <img src={ src } width="160px" css={{ objectPosition: "contain" }}/>
+  </article>
+)
+
 const RelationshipField = ({
   autoFocus,
   field,
@@ -183,16 +193,40 @@ const RelationshipField = ({
 
   const relatedList = field.getRefList();
 
+  
+  const removeFunc = (v) => {
+    let newValue
+    if( Array.isArray(value) ) {
+      newValue = value.filter(vl=>vl.id!=v.id)
+    } else {
+      newValue = null
+    }
+    onChange( newValue )
+  }
+
+
+  let imagenes
+
+  if( many ) {
+    imagenes = value.map(v=>(<Image key={v._label_} src={v._label_} remove={()=>removeFunc(v)}/>))
+  }
+
+
+
+
   return (
     <FieldContainer>
       <FieldLabel htmlFor={htmlID} field={field} errors={errors} />
       <FieldDescription text={field.adminDoc} />
+      
       <FieldInput>
         <div css={{ flex: 1 }}>
           {
             value &&
             value._label_ &&
-            (<img src={ value._label_ } width="160px"/>)
+            ! many
+              ? (<Image src={value._label_} remove={()=>removeFunc(value)}/>)
+              : imagenes
           }
         </div>
         <ListProvider list={relatedList}>
