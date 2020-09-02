@@ -1,4 +1,6 @@
 const { Readable } = require('stream')
+const fetch = require('cross-fetch')
+
 
 const generateSignature = require("./functions/generateSignature")
 

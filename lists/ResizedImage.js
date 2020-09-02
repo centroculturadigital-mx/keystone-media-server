@@ -17,7 +17,7 @@ module.exports = {
     file: {
       type: PathFile,
       adapter: fileAdapter,
-      label: "Archivo descargable",
+      label: "Imagen transformada",
       isRequired: true,
     },
     size: {
@@ -26,7 +26,7 @@ module.exports = {
     },
     image: {
       type: ImageRelationship,
-      ref: "Image.resizedImages"  
+      ref: "Image"  
     }
   },
   adminConfig: {

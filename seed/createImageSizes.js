@@ -13,6 +13,8 @@ const createImageSizes = async (keystone) => {
   });
 
   const imageSizes = res.data.allImageSizes
+  console.log(imageSizes);
+  
 
    if (imageSizes.length === 0) {
 

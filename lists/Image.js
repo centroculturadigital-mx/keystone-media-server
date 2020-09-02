@@ -24,7 +24,7 @@ module.exports = {
     },
     resizedImages: {
       type: Relationship,
-      ref: 'ResizedImage.image',
+      ref: 'ResizedImage',
       many: true
     },
     credits: { type: Text },
