@@ -1,6 +1,16 @@
 const { Readable } = require('stream')
 const fetch = require('cross-fetch')
 
+const { 
+  IS_REMOTE_MEDIA_SERVER,
+  REMOTE_MEDIA_SERVER_URL,
+  IMGPROXY_HOST,
+  IMGPROXY_PORT,
+  LOCAL_MEDIA_SERVER_FOLDER,
+  LOCAL_KEYSTONE_HOST,
+  LOCAL_KEYSTONE_PORT,
+  S3_FOLDER
+} = process.env
 
 const generateSignature = require("./functions/generateSignature")
 
@@ -22,6 +32,8 @@ const onImageInput = async ({
 }) => {
 
   if ( !! resolvedData.original ) {
+
+    console.log('resolvedData.original', resolvedData.original)
 
     const sizeQuery = await keystone.executeGraphQL({
       context: keystone.createContext({ skipAccessControl: true }),
@@ -47,9 +59,18 @@ const onImageInput = async ({
       let size = imageSize ?  imageSize.size : 320
       let imageSizeId = imageSize ? imageSize.id : null 
 
-      const { HOST, PORT, IMGPROXY_HOST, IMGPROXY_PORT, MEDIA_FOLDER } = process.env
+      let domain = LOCAL_KEYSTONE_PORT 
+        ? `${LOCAL_KEYSTONE_HOST}:${LOCAL_KEYSTONE_PORT}` 
+        : LOCAL_KEYSTONE_HOST
       
-      let url = `http://${HOST}:${PORT}/${MEDIA_FOLDER}/${resolvedData.original.filename}`
+      let url = IS_REMOTE_MEDIA_SERVER 
+        ? `${REMOTE_MEDIA_SERVER_URL}/${S3_FOLDER}`
+        : `http://${domain}/${LOCAL_MEDIA_SERVER_FOLDER}`
+
+      url += `/${resolvedData.original.filename}`
+
+      console.log('IS_REMOTE_MEDIA_SERVER', IS_REMOTE_MEDIA_SERVER)
+      console.log('url', url)
 
       const signature = generateSignature({
         url,
@@ -63,8 +84,9 @@ const onImageInput = async ({
 
       let image = await fetch(`http://${IMGPROXY_HOST}:${IMGPROXY_PORT}/${signature}`)
 
-      let filename = resolvedData.original.filename
+      let filename = imageSize.name + imageSize.size + '-' + resolvedData.original.filename
       let name = resolvedData.name || resolvedData.original.filename
+      name = imageSize.name + imageSize.size + '-' + name
       let fileExt = filename.split('.').reverse()[0]
       
       filename = filename.split('-')[1].split('.'+fileExt)[0] + size + '.' +  fileExt

@@ -1,21 +1,20 @@
-const { Relationship, Text } = require('@keystonejs/fields');
+const { Text, Relationship } = require('@keystonejs/fields');
+
+const s3FileAdapter = require('../adapters/s3FileAdapter')
+const localFileAdapter = require('../adapters/localFileAdapter')
 const PathFile = require('../fields/PathFile');
-const { LocalFileAdapter } = require('@keystonejs/file-adapters');
 
-const IMGPROXY_KEY = process.env.IMGPROXY_KEY
-const IMGPROXY_SALT = process.env.IMGPROXY_SALT
+const { IS_REMOTE_MEDIA_SERVER } = process.env
 
-const fileAdapter = new LocalFileAdapter({
-  src: process.env.NODE_ENV === 'production' ? './dist/archivos' : './archivos',
-  path: '/archivos',
-});
+const fileAdapter = IS_REMOTE_MEDIA_SERVER ? s3FileAdapter : localFileAdapter
 
 module.exports = {
   fields: {
     name: { type: Text },
     original: {
       type: PathFile,
-      adapter: fileAdapter
+      adapter: fileAdapter,
+      isRequired: true
     },
     sizes: {
       type: Relationship,
@@ -31,22 +30,5 @@ module.exports = {
     caption: { type: Text },
     owner: { type: Text },
   },
-  labelResolver: item => {
-    if( !! item && !! item.original ) {
-
-      const { DOMAIN, PORT, IMGPROXY_HOST, IMGPROXY_PORT, MEDIA_FOLDER } = process.env
-      let url = `${DOMAIN}/${MEDIA_FOLDER}/${item.original.filename}`
-      
-      return url
-   
-    
-    }
-
-    return item.name
-
-    
-
-
-  }
-
+  labelResolver: item => item.name || item.original.filename
 };

@@ -1,12 +1,12 @@
 const { Text, Relationship } = require('@keystonejs/fields');
-const { LocalFileAdapter } = require('@keystonejs/file-adapters');
 
+const s3FileAdapter = require('../adapters/s3FileAdapter')
+const localFileAdapter = require('../adapters/localFileAdapter')
 const PathFile = require('../fields/PathFile');
 
-const fileAdapter = new LocalFileAdapter({
-  src: process.env.NODE_ENV === 'production' ? './dist/archivos' : './archivos',
-  path: '/archivos',
-});
+const { IS_REMOTE_MEDIA_SERVER } = process.env
+
+const fileAdapter = IS_REMOTE_MEDIA_SERVER ? s3FileAdapter : localFileAdapter
 
 const { atTracking } = require('@keystonejs/list-plugins');
 
