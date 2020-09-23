@@ -169,6 +169,7 @@ export default class PathFileField extends Component {
     const { dataURI } = this.state;
     const { file } = this.getFile();
 
+    console.log('imagePath', file && file.mimetype && file.mimetype.includes('image') ? file.publicUrl : dataURI)
     // avoid jank during FileReader processing keeping the old image in place
     return file && file.mimetype && file.mimetype.includes('image') ? file.publicUrl : dataURI;
   };
@@ -239,30 +240,34 @@ export default class PathFileField extends Component {
                 {errorMessage ? (
                   <ErrorInfo>{errorMessage}</ErrorInfo>
                 ) : (
-                  <FlexGroup isInline growIndexes={[0]}>
-                    <MetaInfo href={file.publicUrl}>{window.location.origin + file.publicUrl}</MetaInfo>
-                    {showStatusMessage ? (
-                      <ChangeInfo status={changeStatus}>
-                        {statusMessage({ status: changeStatus })}
-                      </ChangeInfo>
-                    ) : null}
-                    <CopyToClipboard
-                      text={window.location.origin + file.publicUrl}
-                      onCopy={() => {
-                        this.setState({copied: true})
-                        setTimeout(() => {
-                          this.setState({copied: false})
-                        }, 3000)
-                      }}
-                    >
-                      <span style={{backgroundColor: '#ddd', borderRadius: '3px', padding: '3px', cursor: 'context-menu'}}>Copy</span>
-                    </CopyToClipboard>
-                    <span>
-                      {
-                        this.state.copied ? 'Copied!' : ''
-                      }
-                    </span>
-                  </FlexGroup>
+                  (file && file.publicUrl)
+                    ? (
+                      <FlexGroup isInline growIndexes={[0]}>
+                        <MetaInfo href={file.publicUrl}>{file.publicUrl.includes('http') ? file.publicUrl : window.location.origin + file.publicUrl}</MetaInfo>
+                        {showStatusMessage ? (
+                          <ChangeInfo status={changeStatus}>
+                            {statusMessage({ status: changeStatus })}
+                          </ChangeInfo>
+                        ) : null}
+                        <CopyToClipboard
+                          text={file.publicUrl.includes('http') ? file.publicUrl : window.location.origin + file.publicUrl}
+                          onCopy={() => {
+                            this.setState({copied: true})
+                            setTimeout(() => {
+                              this.setState({copied: false})
+                            }, 3000)
+                          }}
+                        >
+                          <span style={{backgroundColor: '#ddd', borderRadius: '3px', padding: '3px', cursor: 'context-menu'}}>Copy</span>
+                        </CopyToClipboard>
+                        <span>
+                          {
+                            this.state.copied ? 'Copied!' : ''
+                          }
+                        </span>
+                      </FlexGroup>
+                    ) 
+                    : <span>save to see url</span>
                 )}
               </Content>
             </Wrapper>

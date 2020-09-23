@@ -33,8 +33,6 @@ const onImageInput = async ({
 
   if ( !! resolvedData.original ) {
 
-    console.log('resolvedData.original', resolvedData.original)
-
     const sizeQuery = await keystone.executeGraphQL({
       context: keystone.createContext({ skipAccessControl: true }),
       query:`
@@ -42,6 +40,7 @@ const onImageInput = async ({
           allImageSizes {
             id
             size
+            name
           }
         }
       `
@@ -62,15 +61,12 @@ const onImageInput = async ({
       let domain = LOCAL_KEYSTONE_PORT 
         ? `${LOCAL_KEYSTONE_HOST}:${LOCAL_KEYSTONE_PORT}` 
         : LOCAL_KEYSTONE_HOST
-      
-      let url = IS_REMOTE_MEDIA_SERVER 
+
+      let url = IS_REMOTE_MEDIA_SERVER == 1 
         ? `${REMOTE_MEDIA_SERVER_URL}/${S3_FOLDER}`
         : `http://${domain}/${LOCAL_MEDIA_SERVER_FOLDER}`
 
       url += `/${resolvedData.original.filename}`
-
-      console.log('IS_REMOTE_MEDIA_SERVER', IS_REMOTE_MEDIA_SERVER)
-      console.log('url', url)
 
       const signature = generateSignature({
         url,
@@ -84,18 +80,18 @@ const onImageInput = async ({
 
       let image = await fetch(`http://${IMGPROXY_HOST}:${IMGPROXY_PORT}/${signature}`)
 
-      let filename = imageSize.name + imageSize.size + '-' + resolvedData.original.filename
+      let filename = resolvedData.original.filename
       let name = resolvedData.name || resolvedData.original.filename
-      name = imageSize.name + imageSize.size + '-' + name
+      name = `${imageSize.name}${imageSize.size}-${name}`
       let fileExt = filename.split('.').reverse()[0]
       
-      filename = filename.split('-')[1].split('.'+fileExt)[0] + size + '.' +  fileExt
+      filename = `${imageSize.name}${imageSize.size}-${filename}`
 
       const encoding = "7bit"
       const buffer = await image.buffer()
       const mimetype = fileExt == 'png' ? 'image/png' : 'image/jpeg'
 
-      const file = { createReadStream: () => bufferToStream(buffer), filename, mimetype, encoding }
+      const file = { createReadStream: () => bufferToStream(buffer), filename, mimetype, encoding }      
 
       const response = await keystone.executeGraphQL({
         context: keystone.createContext({ skipAccessControl: true }),

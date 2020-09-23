@@ -6,7 +6,7 @@ const PathFile = require('../fields/PathFile');
 
 const { IS_REMOTE_MEDIA_SERVER } = process.env
 
-const fileAdapter = IS_REMOTE_MEDIA_SERVER ? s3FileAdapter : localFileAdapter
+const fileAdapter = IS_REMOTE_MEDIA_SERVER == 1 ? s3FileAdapter : localFileAdapter
 
 module.exports = {
   fields: {
