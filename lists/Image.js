@@ -30,5 +30,30 @@ module.exports = {
     caption: { type: Text },
     owner: { type: Text },
   },
-  labelResolver: item => item.name || item.original.filename
+  labelResolver: item => {
+    if( !! item && !! item.original ) {
+
+      const { 
+        LOCAL_MEDIA_SERVER_FOLDER,
+        LOCAL_KEYSTONE_PORT,
+        LOCAL_KEYSTONE_HOST
+      } = process.env
+
+      let domain = LOCAL_KEYSTONE_PORT 
+        ? `${LOCAL_KEYSTONE_HOST}:${LOCAL_KEYSTONE_PORT}` 
+        : LOCAL_KEYSTONE_HOST 
+
+      let url = item.original.publicUrl.includes('http') 
+       ? item.original.publicUrl
+       : `http://${domain}/${LOCAL_MEDIA_SERVER_FOLDER}/${item.original.filename}`
+
+      console.log('url', url)
+      return url
+   
+    
+    }
+
+    return item.name
+
+  }
 };
