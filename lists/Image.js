@@ -33,19 +33,21 @@ module.exports = {
   labelResolver: item => {
     if( !! item && !! item.original ) {
 
+      console.log(item.original)
+
       const { 
+        DOMAIN,
+        IS_REMOTE_MEDIA_SERVER,
         LOCAL_MEDIA_SERVER_FOLDER,
-        LOCAL_KEYSTONE_PORT,
-        LOCAL_KEYSTONE_HOST
+        REMOTE_MEDIA_SERVER_URL,
+        S3_FOLDER
       } = process.env
 
-      let domain = LOCAL_KEYSTONE_PORT 
-        ? `${LOCAL_KEYSTONE_HOST}:${LOCAL_KEYSTONE_PORT}` 
-        : LOCAL_KEYSTONE_HOST 
+      let url = IS_REMOTE_MEDIA_SERVER == 1 
+        ? `${REMOTE_MEDIA_SERVER_URL}/${S3_FOLDER}`
+        : `${DOMAIN}/${LOCAL_MEDIA_SERVER_FOLDER}`
 
-      let url = item.original.publicUrl.includes('http') 
-       ? item.original.publicUrl
-       : `http://${domain}/${LOCAL_MEDIA_SERVER_FOLDER}/${item.original.filename}`
+      url += `/${item.original.filename}`
 
       console.log('url', url)
       return url
