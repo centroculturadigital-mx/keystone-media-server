@@ -169,7 +169,7 @@ export default class PathFileField extends Component {
     const { dataURI } = this.state;
     const { file } = this.getFile();
 
-    console.log('imagePath', file && file.mimetype && file.mimetype.includes('image') ? file.publicUrl : dataURI)
+    // console.log('imagePath', file && file.mimetype && file.mimetype.includes('image') ? file.publicUrl : dataURI)
     // avoid jank during FileReader processing keeping the old image in place
     return file && file.mimetype && file.mimetype.includes('image') ? file.publicUrl : dataURI;
   };

@@ -4,7 +4,7 @@ import React from 'react';
 
 const ImageRelationship = (payload) => {
 
-    console.log({payload});
+    // console.log({payload});
 
     const { value } = payload
     
