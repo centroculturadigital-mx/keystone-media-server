@@ -32,5 +32,9 @@ module.exports = {
   adminConfig: {
     defaultColumns: 'size,file'
   },
-  labelField: "name"
+  labelField: "name",
+  cacheHint: {
+    scope: 'PUBLIC',
+    maxAge: 0,
+  },
 };

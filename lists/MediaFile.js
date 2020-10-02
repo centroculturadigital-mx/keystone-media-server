@@ -39,7 +39,11 @@ const MediaFile = {
       createdAtField: 'createdAt',
       updatedAtField: 'updatedAt'
     }),
-  ]
+  ],
+  cacheHint: {
+    scope: 'PUBLIC',
+    maxAge: 0,
+  },
 }
 
 module.exports = MediaFile
