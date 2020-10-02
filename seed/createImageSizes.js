@@ -19,10 +19,11 @@ const createImageSizes = async (keystone) => {
    if (imageSizes.length === 0) {
 
     const sizes = [
+      {data: { name:"mini", size:32 } },
       {data: { name:"xs", size:320 } },
       {data: { name:"md", size:768 } },
       {data: { name:"lg", size: 1024 } },
-      {data: { name:"xl", size: 1600 } },
+      {data: { name:"xl", size: 1200 } },
     ]
 
     const res = await keystone.executeGraphQL({
