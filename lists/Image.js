@@ -33,7 +33,7 @@ module.exports = {
   labelResolver: item => {
     if( !! item && !! item.original ) {
 
-      console.log(item.original)
+      // console.log(item.original)
 
       const { 
         DOMAIN,
@@ -49,7 +49,7 @@ module.exports = {
 
       url += `/${item.original.filename}`
 
-      console.log('url', url)
+      // console.log('url', url)
       return url
    
     
@@ -57,5 +57,9 @@ module.exports = {
 
     return item.name
 
-  }
+  },
+  cacheHint: {
+    scope: 'PUBLIC',
+    maxAge: 0,
+  },
 };
