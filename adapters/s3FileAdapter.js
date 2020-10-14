@@ -2,6 +2,8 @@ const { S3Adapter } = require('@keystonejs/file-adapters');
 
 const { S3_KEY, S3_SECRET, S3_BUCKET, S3_FOLDER } = process.env
 
+console.log(S3_KEY, S3_SECRET, S3_BUCKET, S3_FOLDER)
+
 const fileAdapter = new S3Adapter({
   accessKeyId: S3_KEY,
   secretAccessKey: S3_SECRET,

@@ -26,8 +26,8 @@ module.exports = {
     },
     image: {
       type: ImageRelationship,
-      ref: "Image"  
-    }
+      ref: "Image.resizedImages"  
+    },
   },
   adminConfig: {
     defaultColumns: 'size,file'

@@ -1,0 +1,10 @@
+ARG NODE_VERSION=
+
+FROM node:12.6
+
+RUN echo "dockerfile.local"
+
+WORKDIR /media-server-backend
+
+# CMD [ "ls" ]
+CMD ["npm", "run", "dev"]

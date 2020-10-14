@@ -1,0 +1,55 @@
+version: "3.4"
+
+services:
+
+  mongo:
+    container_name: mongo
+    image: mongo
+    volumes:
+      - db:/data/db
+    logging:
+      driver: none
+
+  imgproxy:
+    image: darthsim/imgproxy
+    container_name: imgproxy
+    ports: 
+      - "${MEDIA_SERVER_IMGPROXY_PORT}:${MEDIA_SERVER_IMGPROXY_PORT}"
+    environment: 
+      IMGPROXY_KEY: ${MEDIA_SERVER_IMGPROXY_KEY}
+      IMGPROXY_SALT: ${MEDIA_SERVER_IMGPROXY_SALT}
+
+  nginx: 
+
+  media-server-backend:
+    container_name: media-server-backend
+    build: 
+      context: ./media-server-backend
+      dockerfile: ./Dockerfile
+    ports:
+      - 3000:3000
+    volumes:
+      - archivos:/media-server-backend/dist/archivos
+      - ./media-server-backend:/media-server-backend/
+    depends_on: 
+      - mongo
+      - imgproxy
+    environment:
+      PORT: 3000
+      SEED_DB: 0
+      NODE_ENV: development
+      MONGO_URI: mongodb://mongo:27017/media-server
+      DOMAIN: ${MEDIA_SERVER_BACKEND_DOMAIN}
+      LOCAL_MEDIA_SERVER_FOLDER: ${LOCAL_MEDIA_SERVER_FOLDER}
+      LOCAL_KEYSTONE_HOST: ${LOCAL_KEYSTONE_HOST}
+      LOCAL_KEYSTONE_PORT: ${LOCAL_KEYSTONE_PORT}
+      S3_KEY: ${S3_KEY}
+      S3_SECRET: ${S3_SECRET}
+      S3_BUCKET: ${S3_BUCKET}
+      S3_FOLDER: ${S3_FOLDER}
+      REMOTE_MEDIA_SERVER_URL: ${REMOTE_MEDIA_SERVER_URL}
+      HOST: media-server-backend
+      IMGPROXY_HOST: ${IMGPROXY_HOST}
+      IMGPROXY_PORT: ${IMGPROXY_PORT}
+      IMGPROXY_KEY: ${IMGPROXY_KEY}
+      IMGPROXY_SALT: ${IMGPROXY_SALT}
