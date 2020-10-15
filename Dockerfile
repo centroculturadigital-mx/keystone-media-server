@@ -1,5 +1,5 @@
 # https://docs.docker.com/samples/library/node/
-ARG NODE_VERSION=12
+ARG NODE_VERSION=12.6
 # https://github.com/Yelp/dumb-init/releases
 ARG DUMB_INIT_VERSION=1.2.2
 
@@ -12,37 +12,72 @@ RUN echo "dockerfile"
 
 ARG PORT
 ENV PORT $PORT
-ARG NODE_ENV
-ENV NODE_ENV $NODE_ENV
-ARG MONGO_ROOT_USR
-ENV MONGO_ROOT_USR $MONGO_ROOT_USR
-ARG MONGO_ROOT_PWD
-ENV MONGO_ROOT_PWD $MONGO_ROOT_PWD
-ARG MONGO_HOST
-ENV MONGO_HOST $MONGO_HOST
-ARG MONGO_PORT
-ENV MONGO_PORT $MONGO_PORT
-ARG MONGO_DB
-ENV MONGO_DB $MONGO_DB
+
 ARG BUILD_STAGE
 ENV BUILD_STAGE $BUILD_STAGE
-ARG FRONTEND_URL
-ENV FRONTEND_URL $FRONTEND_URL
 
-WORKDIR /hipermedial-backend
+ARG NODE_ENV
+ENV NODE_ENV $NODE_ENV
 
-RUN apk add --no-cache build-base python2 yarn && \
+ARG MONGO_URI
+ENV MONGO_URI $MONGO_URI
+
+ARG DOMAIN
+ENV DOMAIN $DOMAIN
+
+ARG LOCAL_MEDIA_SERVER_FOLDER
+ENV LOCAL_MEDIA_SERVER_FOLDER $LOCAL_MEDIA_SERVER_FOLDER
+
+ARG LOCAL_KEYSTONE_HOST
+ENV LOCAL_KEYSTONE_HOST $LOCAL_KEYSTONE_HOST
+
+ARG LOCAL_KEYSTONE_PORT
+ENV LOCAL_KEYSTONE_PORT $LOCAL_KEYSTONE_PORT
+
+ARG S3_KEY
+ENV S3_KEY $S3_KEY
+
+ARG S3_SECRET
+ENV S3_SECRET $S3_SECRET
+
+ARG S3_BUCKET
+ENV S3_BUCKET $S3_BUCKET
+
+ARG S3_FOLDER
+ENV S3_FOLDER $S3_FOLDER
+
+ARG REMOTE_MEDIA_SERVER_URL
+ENV REMOTE_MEDIA_SERVER_URL $REMOTE_MEDIA_SERVER_URL
+
+ARG IMGPROXY_HOST
+ENV IMGPROXY_HOST $IMGPROXY_HOST
+
+ARG IMGPROXY_PORT
+ENV IMGPROXY_PORT $IMGPROXY_PORT
+
+ARG IMGPROXY_KEY
+ENV IMGPROXY_KEY $IMGPROXY_KEY
+
+ARG IMGPROXY_SALT
+ENV IMGPROXY_SALT $IMGPROXY_SALT
+
+WORKDIR /app
+
+RUN apk add --no-cache build-base python2 && \
     wget -O dumb-init -q https://github.com/Yelp/dumb-init/releases/download/v${DUMB_INIT_VERSION}/dumb-init_${DUMB_INIT_VERSION}_amd64 && \
     chmod +x dumb-init
-ADD . /hipermedial-backend
-RUN yarn install && yarn build && yarn cache clean
+ADD . /app
+
+RUN ls
+RUN npm install && npm run build
 
 # Runtime container
 FROM node:${NODE_VERSION}-alpine
 
-WORKDIR /hipermedial-backend
+WORKDIR /app
 
+RUN ls
 
-COPY --from=build /hipermedial-backend /hipermedial-backend
+COPY --from=build /app /app
 
-CMD ["./dumb-init", "yarn", "start"]
+CMD ["./dumb-init", "npm", "run", "start"]

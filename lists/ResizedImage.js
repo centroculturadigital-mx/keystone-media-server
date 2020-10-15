@@ -5,20 +5,18 @@ const ImageRelationship = require('../fields/ImageRelationship')
 const s3FileAdapter = require('../adapters/s3FileAdapter')
 const localFileAdapter = require('../adapters/localFileAdapter')
 
-const { IS_REMOTE_MEDIA_SERVER } = process.env
-
-const fileAdapter = IS_REMOTE_MEDIA_SERVER == 1 ? s3FileAdapter : localFileAdapter
-
 module.exports = {
   fields: {
     name: {
       type: Text,
     },
-    file: {
+    fileLocal: {
       type: PathFile,
-      adapter: fileAdapter,
-      label: "Imagen transformada",
-      isRequired: true,
+      adapter: localFileAdapter,
+    },
+    fileRemote: {
+      type: PathFile,
+      adapter: s3FileAdapter,
     },
     size: {
       type: Relationship,
@@ -30,7 +28,7 @@ module.exports = {
     },
   },
   adminConfig: {
-    defaultColumns: 'size,file'
+    defaultColumns: 'size,fileLocal, fileRemote'
   },
   labelField: "name"
 };

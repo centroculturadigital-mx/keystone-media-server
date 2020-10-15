@@ -22,7 +22,6 @@ function bufferToStream(buffer) {
 }
 
 const onImageInput = async ({
-  keystone,
   operation,
   existingItem,
   originalInput,
@@ -31,10 +30,15 @@ const onImageInput = async ({
   actions,
 }) => {
 
-  if ( !! resolvedData.original ) {
+  console.log('resolvedData', resolvedData);
+  
+  if ( !! resolvedData.fileRemote || !! resolvedData.fileLocal ) {
 
-    const sizeQuery = await keystone.executeGraphQL({
-      context: keystone.createContext({ skipAccessControl: true }),
+
+    console.log('cambio imagen');
+
+    const sizeQuery = await context.executeGraphQL({
+      context: context.createContext({ skipAccessControl: true }),
       query:`
         query {
           allImageSizes {
@@ -45,6 +49,9 @@ const onImageInput = async ({
         }
       `
     })
+
+    console.log('sizeQuery', sizeQuery);
+
 
     const imageSizes = sizeQuery.data.allImageSizes
 
@@ -62,11 +69,14 @@ const onImageInput = async ({
         ? `${LOCAL_KEYSTONE_HOST}:${LOCAL_KEYSTONE_PORT}` 
         : LOCAL_KEYSTONE_HOST
 
-      let url = IS_REMOTE_MEDIA_SERVER == 1 
+      let url = !! resolvedData.fileRemote 
         ? `${REMOTE_MEDIA_SERVER_URL}/${S3_FOLDER}`
         : `http://${domain}/${LOCAL_MEDIA_SERVER_FOLDER}`
 
-      url += `/${resolvedData.original.filename}`
+      let file = resolvedData.fileRemote || resolvedData.fileLocal
+      url += `/${file.filename}`
+
+      console.log('url', url)
 
       const signature = generateSignature({
         url,
@@ -80,8 +90,8 @@ const onImageInput = async ({
 
       let image = await fetch(`http://${IMGPROXY_HOST}:${IMGPROXY_PORT}/${signature}`)
 
-      let filename = resolvedData.original.filename
-      let name = resolvedData.name || resolvedData.original.filename
+      let filename = file.filename
+      let name = resolvedData.name || file.filename
       name = `${imageSize.name}${imageSize.size}-${name}`
       let fileExt = filename.split('.').reverse()[0]
       
@@ -91,37 +101,38 @@ const onImageInput = async ({
       const buffer = await image.buffer()
       const mimetype = fileExt == 'png' ? 'image/png' : 'image/jpeg'
 
-      const file = { createReadStream: () => bufferToStream(buffer), filename, mimetype, encoding }      
+      const newFile = { createReadStream: () => bufferToStream(buffer), filename, mimetype, encoding }      
 
-      const response = await keystone.executeGraphQL({
-        context: keystone.createContext({ skipAccessControl: true }),
+      let variablesData = {
+        name,
+        size: {connect: {id: imageSizeId}}
+      }
+
+      if (resolvedData.fileRemote) {
+        variablesData.fileRemote = newFile
+      } else {
+        variablesData.fileLocal = newFile
+      }
+
+      const response = await context.executeGraphQL({
+        context: context.createContext({ skipAccessControl: true }),
         query:`
           mutation generateResizedImage(
-            $name: String, 
-            $file: Upload,
-            $size: ID!
+            $data: ResizedImageCreateInput!
           ) {
             createResizedImage (
-              data: {
-                name: $name,
-                file: $file,
-                size: {
-                  connect: {
-                    id: $size
-                  }
-                }
-              }
+              data: $data
             ) {
               id
             }
           }
         `,
         variables: {
-          name,
-          file,
-          size: imageSizeId
+          data: variablesData
         },
       })
+
+      console.log('createResizedImage', response)
 
       if ( ! Array.isArray(resolvedData.resizedImages) ) {
         resolvedData.resizedImages = []

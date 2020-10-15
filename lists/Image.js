@@ -42,10 +42,13 @@ module.exports = {
     caption: { type: Text },
     owner: { type: Text },
   },
+  adminConfig: {
+    defaultColumns: 'size,fileLocal, fileRemote'
+  },
+  labelField: "name",
   labelResolver: item => {
-    if( !! item && !! item.original ) {
-
-      console.log(item.original)
+    let file = item.fileRemote || item.fileLocal
+    if( file ) {
 
       const { 
         DOMAIN,
@@ -55,11 +58,11 @@ module.exports = {
         S3_FOLDER
       } = process.env
 
-      let url = IS_REMOTE_MEDIA_SERVER == 1 
+      let url = !! item.fileRemote
         ? `${REMOTE_MEDIA_SERVER_URL}/${S3_FOLDER}`
         : `${DOMAIN}/${LOCAL_MEDIA_SERVER_FOLDER}`
 
-      url += `/${item.original.filename}`
+      url += `/${file.filename}`
 
       console.log('url', url)
       return url

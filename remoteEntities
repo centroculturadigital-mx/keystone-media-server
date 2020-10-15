@@ -1,0 +1,9 @@
+# entities
+
+npm i @ccd/RemoteImage
+  RemoteImage
+    - url ! - Text
+    - resizedImages - Relationship (RemoteImage)
+    - sizeName -  
+    - size - 
+

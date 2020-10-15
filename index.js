@@ -4,9 +4,10 @@ const { GraphQLApp } = require('@keystonejs/app-graphql');
 const { AdminUIApp } = require('@keystonejs/app-admin-ui');
 const expressSession = require('express-session');
 const MongoStore = require('connect-mongo')(expressSession);
+const initialiseData = require('./initial-data');
 const { MongooseAdapter: Adapter } = require('@keystonejs/adapter-mongoose');
 const { StaticApp } = require('@keystonejs/app-static');
-const responseCachePlugin = require('apollo-server-plugin-response-cache');
+// const responseCachePlugin = require('apollo-server-plugin-response-cache');
 
 const {
   MONGO_URI,
@@ -22,7 +23,8 @@ const {
   ResizedImage,
   Project,
   Folder,
-  Tag
+  Tag,
+  User
 } = require('./lists')
 
 const resolveImageInput = require('./resolvers/imageInput') 
@@ -47,11 +49,9 @@ const keystone = new Keystone({
   sessionStore,
   name: PROJECT_NAME,
   adapter: new Adapter(adapterConfig),
-  // onConnect: initialiseData,
-  onConnect: () => { console.log('conencted') },
+  onConnect: initialiseData,
+  // onConnect: () => { console.log('conencted') },
 });
-
-
 
 Image.hooks = {
   resolveInput: (params) => resolveImageInput({
@@ -67,19 +67,27 @@ keystone.createList('MediaFile', MediaFile);
 keystone.createList('Project', Project);
 keystone.createList('Folder', Folder);
 keystone.createList('Tag', Tag);
+keystone.createList('User', User);
+
+const authStrategy = keystone.createAuthStrategy({
+  type: PasswordAuthStrategy,
+  list: 'User',
+});
+
 
 let apps = [
   BUILD_STAGE == 1 ? new GraphQLApp() : new GraphQLApp({
     sessionStore,
-    apollo: {
-      cacheControl: {
-        defaultMaxAge: 300,
-      },
-      plugins: [responseCachePlugin()],
-    },
+    // apollo: {
+    //   cacheControl: {
+    //     defaultMaxAge: 300,
+    //   },
+    //   plugins: [responseCachePlugin()],
+    // },
   }),
   new AdminUIApp({
     enableDefaultRoute: true,
+    authStrategy
   }),
   new StaticApp({
     path: staticPath,
