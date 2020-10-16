@@ -76,8 +76,12 @@ FROM node:${NODE_VERSION}-alpine
 
 WORKDIR /app
 
-RUN ls
+
 
 COPY --from=build /app /app
+
+RUN rm -rf node_modules/@keystonejs/keystone/node_modules/graphql
+
+RUN ls dist
 
 CMD ["./dumb-init", "npm", "run", "start"]
