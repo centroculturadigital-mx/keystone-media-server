@@ -11,7 +11,6 @@
     "node": ">=10.0.0"
   },
   "scripts": {
-    "preinstall": "npx npm-force-resolutions",
     "dev": "cross-env NODE_ENV=development DISABLE_LOGGING=true keystone dev",
     "build": "cross-env NODE_ENV=production keystone build -o dist",
     "start": "cross-env NODE_ENV=production keystone start",
@@ -37,10 +36,10 @@
     "cross-env": "^7.0.2",
     "dotenv": "^8.2.0",
     "faker": "^5.1.0",
-    "graphql": "^15.3.0",
+    "graphql": "^14.6.0",
     "nodemailer": "^6.4.13"
   },
   "resolutions": {
-    "graphql": "15.3.0"
+    "graphql": "14.6.0"
   }
 }
