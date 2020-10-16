@@ -1,0 +1,28 @@
+version: "3.4"
+
+services:
+
+  media-server-backend:
+    image: registry.gitlab.com/centroculturadigital-mx/servidor-media/keystone-media-server
+    build: 
+      context: ./
+      dockerfile: ./Dockerfile
+      args: 
+        NODE_ENV: production
+        PORT: 3000
+        NODE_ENV: development
+        MONGO_URI: mongodb://mongo:27017/media-server
+        DOMAIN: ${MEDIA_SERVER_BACKEND_DOMAIN}
+        LOCAL_MEDIA_SERVER_FOLDER: ${LOCAL_MEDIA_SERVER_FOLDER}
+        LOCAL_KEYSTONE_HOST: ${LOCAL_KEYSTONE_HOST}
+        LOCAL_KEYSTONE_PORT: ${LOCAL_KEYSTONE_PORT}
+        S3_KEY: ${S3_KEY}
+        S3_SECRET: ${S3_SECRET}
+        S3_BUCKET: ${S3_BUCKET}
+        S3_FOLDER: ${S3_FOLDER}
+        REMOTE_MEDIA_SERVER_URL: ${REMOTE_MEDIA_SERVER_URL}
+        IMGPROXY_HOST: ${IMGPROXY_HOST}
+        IMGPROXY_PORT: ${IMGPROXY_PORT}
+        IMGPROXY_KEY: ${IMGPROXY_KEY}
+        IMGPROXY_SALT: ${IMGPROXY_SALT}
+        BUILD_STAGE: 1
