@@ -71,7 +71,7 @@ services:
     environment:
       PORT: 3000
       NODE_ENV: development
-      MONGO_URI: mongodb://mongo:27017/media-server
+      MONGO_URI: mongodb://${MONGO_DB_USR}:${MONGO_DB_PWD}@mongo:27017/media-server
       DOMAIN: ${MEDIA_SERVER_BACKEND_DOMAIN}
       LOCAL_MEDIA_SERVER_FOLDER: ${LOCAL_MEDIA_SERVER_FOLDER}
       LOCAL_KEYSTONE_HOST: ${LOCAL_KEYSTONE_HOST}
