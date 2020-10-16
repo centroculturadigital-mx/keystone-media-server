@@ -80,6 +80,7 @@ WORKDIR /app
 
 COPY --from=build /app /app
 
+# Hack necesario para buildear en v.>= 16 de keystone
 RUN rm -rf node_modules/@keystonejs/keystone/node_modules/graphql
 
 RUN ls dist
