@@ -28,7 +28,10 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
       - ./index.html:/data/www/index.html
+      - ./index.html:/data/www/mundo/index.html
       - ./index.html:/data/www/imgproxy/index.html
+      - /home/letsencrypt/data/.well-known:/data/www/.well-known  
+      - /home/letsencrypt/certs:/etc/letsencrypt
     ports:
       - 80:80
       - 443:443
