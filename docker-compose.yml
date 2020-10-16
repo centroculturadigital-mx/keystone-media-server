@@ -28,7 +28,10 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
       - ./index.html:/data/www/index.html
+      - ./index.html:/data/www/mundo/index.html
       - ./index.html:/data/www/imgproxy/index.html
+      - /home/letsencrypt/data/.well-known:/data/www/.well-known  
+      - /home/letsencrypt/certs:/etc/letsencrypt
     ports:
       - 80:80
       - 443:443
@@ -37,34 +40,12 @@ services:
 
   media-server-backend:
     image: registry.gitlab.com/centroculturadigital-mx/servidor-media/keystone-media-server
+    volumes:
+      - archivos:/app/dist/archivos  
+
     container_name: media-server-backend
-    build: 
-      context: ./
-      dockerfile: ./Dockerfile
-      args: 
-        NODE_ENV: production
-        PORT: 3000
-        NODE_ENV: development
-        MONGO_URI: mongodb://mongo:27017/media-server
-        DOMAIN: ${MEDIA_SERVER_BACKEND_DOMAIN}
-        LOCAL_MEDIA_SERVER_FOLDER: ${LOCAL_MEDIA_SERVER_FOLDER}
-        LOCAL_KEYSTONE_HOST: ${LOCAL_KEYSTONE_HOST}
-        LOCAL_KEYSTONE_PORT: ${LOCAL_KEYSTONE_PORT}
-        S3_KEY: ${S3_KEY}
-        S3_SECRET: ${S3_SECRET}
-        S3_BUCKET: ${S3_BUCKET}
-        S3_FOLDER: ${S3_FOLDER}
-        REMOTE_MEDIA_SERVER_URL: ${REMOTE_MEDIA_SERVER_URL}
-        IMGPROXY_HOST: ${IMGPROXY_HOST}
-        IMGPROXY_PORT: ${IMGPROXY_PORT}
-        IMGPROXY_KEY: ${IMGPROXY_KEY}
-        IMGPROXY_SALT: ${IMGPROXY_SALT}
-        BUILD_STAGE: 1
     expose:
       - 3000
-    volumes:
-      - ./:/media-server-backend/
-      - ./archivos:/media-server-backend/dist/archivos
     depends_on: 
       - mongo
       - imgproxy
