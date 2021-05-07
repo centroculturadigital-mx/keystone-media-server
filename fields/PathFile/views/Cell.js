@@ -22,8 +22,6 @@ export default ({ data }) => {
   const isImage = data.mimetype.includes('image');
   const truncatedFilename = data.filename.replace(`${data.id}-`, '');
 
-  console.log('data.publicUrl', data.publicUrl)
-
   return isImage ? (
     <Image alt={truncatedFilename} src={data.publicUrl} />
   ) : (

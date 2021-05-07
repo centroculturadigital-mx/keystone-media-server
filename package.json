@@ -31,6 +31,7 @@
     "@keystonejs/keystone": "^17.1.0",
     "@keystonejs/list-plugins": "^7.1.1",
     "apollo-server-plugin-response-cache": "^0.5.5",
+    "aws-sdk": "^2.9.0",
     "axios": "^0.20.0",
     "connect-mongo": "^3.2.0",
     "cross-env": "^7.0.2",

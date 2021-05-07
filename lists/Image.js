@@ -52,19 +52,18 @@ module.exports = {
 
       const { 
         DOMAIN,
-        IS_REMOTE_MEDIA_SERVER,
         LOCAL_MEDIA_SERVER_FOLDER,
         REMOTE_MEDIA_SERVER_URL,
-        S3_FOLDER
+        S3_FOLDER,
+        S3_BUCKET,
       } = process.env
 
       let url = !! item.fileRemote
-        ? `${REMOTE_MEDIA_SERVER_URL}/${S3_FOLDER}`
+        ? `${REMOTE_MEDIA_SERVER_URL}/${S3_BUCKET}/${S3_FOLDER}`
         : `${DOMAIN}/${LOCAL_MEDIA_SERVER_FOLDER}`
 
       url += `/${file.filename}`
 
-      console.log('url', url)
       return url
    
     

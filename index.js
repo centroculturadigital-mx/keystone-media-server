@@ -50,7 +50,6 @@ const keystone = new Keystone({
   name: PROJECT_NAME,
   adapter: new Adapter(adapterConfig),
   onConnect: initialiseData,
-  // onConnect: () => { console.log('conencted') },
 });
 
 Image.hooks = {

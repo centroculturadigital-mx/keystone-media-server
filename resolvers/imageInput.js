@@ -9,7 +9,8 @@ const {
   LOCAL_MEDIA_SERVER_FOLDER,
   LOCAL_KEYSTONE_HOST,
   LOCAL_KEYSTONE_PORT,
-  S3_FOLDER
+  S3_FOLDER,
+  S3_BUCKET,
 } = process.env
 
 const generateSignature = require("./functions/generateSignature")
@@ -30,12 +31,7 @@ const onImageInput = async ({
   actions,
 }) => {
 
-  console.log('resolvedData', resolvedData);
-  
   if ( !! resolvedData.fileRemote || !! resolvedData.fileLocal ) {
-
-
-    console.log('cambio imagen');
 
     const sizeQuery = await context.executeGraphQL({
       context: context.createContext({ skipAccessControl: true }),
@@ -49,8 +45,6 @@ const onImageInput = async ({
         }
       `
     })
-
-    console.log('sizeQuery', sizeQuery);
 
 
     const imageSizes = sizeQuery.data.allImageSizes
@@ -70,13 +64,11 @@ const onImageInput = async ({
         : LOCAL_KEYSTONE_HOST
 
       let url = !! resolvedData.fileRemote 
-        ? `${REMOTE_MEDIA_SERVER_URL}/${S3_FOLDER}`
+        ? `${REMOTE_MEDIA_SERVER_URL}/${S3_BUCKET}/${S3_FOLDER}`
         : `http://${domain}/${LOCAL_MEDIA_SERVER_FOLDER}`
 
       let file = resolvedData.fileRemote || resolvedData.fileLocal
       url += `/${file.filename}`
-
-      console.log('url', url)
 
       const signature = generateSignature({
         url,
@@ -131,8 +123,6 @@ const onImageInput = async ({
           data: variablesData
         },
       })
-
-      console.log('createResizedImage', response)
 
       if ( ! Array.isArray(resolvedData.resizedImages) ) {
         resolvedData.resizedImages = []
